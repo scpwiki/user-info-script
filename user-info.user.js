@@ -22,8 +22,7 @@ function getUserId() {
   const userIdRegex = /https?:\/\/www\.wikidot\.com\/account\/messages#\/new\/(\d+)/;
   const matches = element.href.match(userIdRegex);
   if (matches === null) {
-    alert(`Private message href doesn't match regex: ${element.href}`);
-    return;
+    throw new Error(`Private message href doesn't match regex: ${element.href}`);
   }
 
   return matches[1];
@@ -68,8 +67,7 @@ function addDescriptionEntry(descriptionList, key, value, insertIndex) {
     // 0+ means add at that index
     const insertBeforeElement = descriptionList.children[insertIndex];
     if (!insertBeforeElement) {
-      alert(`Invalid insertion index: ${insertIndex} (only ${descriptionList.children.length} items)`);
-      return;
+      throw new Error(`Invalid insertion index: ${insertIndex} (only ${descriptionList.children.length} items)`);
     }
 
     descriptionList.insertBefore(dt, insertBeforeElement);
@@ -102,8 +100,7 @@ function insertFields(infoElement) {
   console.log('Reading fields');
   const descriptionList = infoElement.querySelector('dl.dl-horizontal');
   if (!descriptionList) {
-    alert('No description list in user info area?');
-    return;
+    throw new Error('No description list in user info area?');
   }
 
   const userId = getUserId();
