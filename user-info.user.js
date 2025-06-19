@@ -16,13 +16,6 @@
 // @include     https://scp-wiki.wikidot.com/system:user/*
 // ==/UserScript==
 
-let USER_ID;
-let USERNAME;
-let WIKIDOT_JOIN_DATE;
-let WIKIDOT_DAYS;
-let SITE_JOIN_DATE = null;
-let SITE_DAYS = null;
-
 function getUserId() {
   const element = document.querySelector('a.btn.btn-default.btn-xs');
   const userIdRegex = /https?:\/\/www\.wikidot\.com\/account\/messages#\/new\/(\d+)/;
@@ -30,12 +23,24 @@ function getUserId() {
   return matches[1];
 }
 
+let FETCHED_DATA = false;
+const USER_ID = getUserId();
+let USERNAME;
+let WIKIDOT_JOIN_DATE;
+let WIKIDOT_DAYS;
+let SITE_JOIN_DATE = null;
+let SITE_DAYS = null;
+
 async function fetchUserInfo(userId) {
+  if (FETCHED_DATA) {
+    return;
+  }
+
   // Fetch request HTML and write into hidden element for querying
   const dateRegex = /([^,]+, [0-9]{2}:[0-9]{2}) \(([0-9]+ days) .+\)/;
   const element = document.createElement('html');
   element.innerHTML = await new Promise(resolve => (
-    OZONE.ajax.requestModule('users/UserInfoWinModule', {user_id: userId}, resolve)
+    unsafeWindow.OZONE.ajax.requestModule('users/UserInfoWinModule', {user_id: userId}, resolve)
   ));
 
   // Get username from header
@@ -74,6 +79,8 @@ async function fetchUserInfo(userId) {
     SITE_JOIN_DATE = new Date(matches[1]);
     SITE_DAYS = matches[2];
   }
+
+  FETCHED_DATA = true;
 }
 
 function addDescriptionEntry(descriptionList, key, value, insertIndex) {
@@ -99,19 +106,7 @@ function addDescriptionEntry(descriptionList, key, value, insertIndex) {
   }
 }
 
-async function main() {
-  // Fetch data (one-time)
-  USER_ID = getUserId();
-  fetchUserInfo(USER_ID);
-
-  // TODO add listener to re-add fields when switching back to "profile"
-
-  const infoElement = document.getElementById('user-info-area');
-  if (!infoElement) {
-    alert('No user info area?');
-    return;
-  }
-
+function insertFields(infoElement) {
   const descriptionList = infoElement.querySelector('dl.dl-horizontal');
   if (!descriptionList) {
     alert('No description list in user info area?');
@@ -122,8 +117,25 @@ async function main() {
   addDescriptionEntry(descriptionList, 'User ID:', USER_ID, 0);
   addDescriptionEntry(descriptionList, 'User name:', USERNAME, 1);
 
-  const infoLine = `${username} (W: ${WIKIDOT_DAYS}, S: ${SITE_DAYS || 'none'}, ID: ${USER_ID})`;
+  const infoLine = `${USERNAME} (W: ${WIKIDOT_DAYS}, S: ${SITE_DAYS || 'none'}, ID: ${USER_ID})`;
   addDescriptionEntry(descriptionList, 'Info line:', infoLine, -1);
+}
+
+function main() {
+  // Set up observer to insert info every time the profile is switched to
+  console.log('Creating observer for user profile');
+  const element = document.getElementById('user-info-area');
+  const observer = new MutationObserver(() => {
+    const profileElement = element.querySelector('div.profile-box');
+    if (profileElement !== null) {
+      // This is the right tab, update
+      // note that fetchUserInfo() only runs once
+      fetchUserInfo(USER_ID);
+      insertFields(element);
+    }
+
+    observer.observe(element, { childList: true });
+  });
 }
 
 main();
