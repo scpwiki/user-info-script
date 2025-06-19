@@ -23,69 +23,22 @@ function getUserId() {
   return matches[1];
 }
 
-let FETCHED_DATA = false;
-const USER_ID = getUserId();
-let USERNAME;
-let WIKIDOT_JOIN_DATE;
-let SITE_JOIN_DATE;
-
-async function fetchUserInfo(userId) {
-  if (FETCHED_DATA) {
-    console.debug('Already fetched user profile information');
-    return;
+function getDateFromSpan(odate) {
+  const timestampRegex = /time_(\d+)/;
+  for (let i = 0; i < odate.classList.length; i++) {
+    const matches = odate.classList[i].match(timestampRegex);
+    const timestamp = parseInt(matches[1]);
+    return new Date(timestamp * 1000);
   }
 
-  // Fetch request HTML and write into hidden element for querying
-  console.log('Fetching user profile information');
-  const element = document.createElement('html');
-  element.innerHTML = await new Promise(resolve => (
-    unsafeWindow.OZONE.ajax.requestModule('users/UserInfoWinModule', {user_id: userId}, resolve)
-  ));
+  throw new Error('No time_ class in odate span');
+}
 
-  // Get username from header
-  USERNAME = element.querySelector('h1').innerText;
-  console.log(`Got username: ${USERNAME}`);
-
-  // Get data from fields
-  const fields = element.querySelectorAll('tr td');
-  let i;
-
-  // The first date field is the Wikidot join date
-  for (i = 0; i < fields.length; i++) {
-    const field = fields[i];
-    if (field.classList.contains('active')) {
-      // Ignore keys
-      continue;
-    }
-
-    const value = field.innerText.trim();
-    const date = new Date(value);
-    if (isNaN(date)) {
-      // This isn't a date, keep moving
-      continue;
-    }
-
-    // This *is* a date, so extract the fields and quit searching
-    // (but save index so we can get the second one)
-    WIKIDOT_JOIN_DATE = date;
-    console.log(`Got wikidot join date: ${WIKIDOT_JOIN_DATE}`);
-  }
-
-  // The second date field (if it exists) is the site join date
-  SITE_JOIN_DATE = null;
-  for (; i < fields.length; i++) {
-    // Same logic, as above
-    const field = fields[i];
-    const matches = field.innerText.match(dateRegex);
-    if (matches === null) {
-      continue;
-    }
-
-    SITE_JOIN_DATE = new Date(matches[1]);
-    console.log(`Got wikidot join date: ${SITE_JOIN_DATE}`);
-  }
-
-  FETCHED_DATA = true;
+function getDates(descriptionList) {
+  const [wikidotDateElement, siteDateElement] = descriptionList.querySelectorAll('dd span.odate');
+  const wikidotDate = getDateFromSpan(wikidotDateElement);
+  const siteDate = siteDateElement ? getDateFromSpan(siteDateElement) : null;
+  return { wikidotDatee, siteDate };
 }
 
 function addDescriptionEntry(descriptionList, key, value, insertIndex) {
@@ -123,10 +76,7 @@ function daysBetween(startDate, endDate) {
 }
 
 function daysString(date) {
-  if (date === undefined) {
-    // indicates an error
-    throw new Error('Undefined date value from user profile fetch');
-  } else if (date === null) {
+  if (date === null) {
     // date missing, not an error
     return 'none';
   }
@@ -153,18 +103,18 @@ function insertFields(infoElement) {
 }
 
 async function main() {
+  // Initial insertion of fields
+  const element = document.getElementById('user-info-area');
+  insertFields(element);
+
   // Set up observer to insert info every time the profile is switched to
   console.log('Creating observer for user profile');
-  const element = document.getElementById('user-info-area');
   const observer = new MutationObserver(async () => {
     const profileElement = element.querySelector('div.profile-box');
     if (profileElement !== null) {
       // This is the right tab, update
-      // note that fetchUserInfo() only runs once
-      await fetchUserInfo(USER_ID);
       insertFields(element);
     }
-
   });
 
   observer.observe(element, { childList: true });
