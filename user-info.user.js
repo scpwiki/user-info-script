@@ -24,6 +24,13 @@ function getUserId() {
   return matches[1];
 }
 
+function getUsername() {
+  // NOTE: This username does *not* preserve leading or trailing whitespace
+  //       (The element we are extracting from here does not preserve it)
+  const element = document.querySelector('h1.profile-title');
+  return element.innerText.trim();
+}
+
 function getDateFromSpan(odate) {
   const timestampRegex = /time_(\d+)/;
   for (let i = 0; i < odate.classList.length; i++) {
@@ -93,13 +100,16 @@ function insertFields(infoElement) {
     return;
   }
 
-  // Add new info elements
-  addDescriptionEntry(descriptionList, 'User ID:', USER_ID, 0);
-  addDescriptionEntry(descriptionList, 'User name:', USERNAME, 2);
+  const userId = getUserId();
+  const username = getUsername();
+  const {wikidotDate, siteDate} = getDates(infoElement);
 
-  const wikidotDays = daysString(WIKIDOT_JOIN_DATE);
-  const siteDays = daysString(SITE_JOIN_DATE);
-  const infoLine = `${USERNAME} (W: ${wikidotDays}, S: ${siteDays}, ID: ${USER_ID})`;
+  // Add fields
+  addDescriptionEntry(descriptionList, 'User ID:', userId, 0);
+
+  const wikidotDays = daysString(wikidotDate);
+  const siteDays = daysString(siteDate);
+  const infoLine = `${username} (W: ${wikidotDays}, S: ${siteDays}, ID: ${USER_ID})`;
   addDescriptionEntry(descriptionList, 'Info line:', infoLine, -1);
 }
 
