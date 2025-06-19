@@ -9,7 +9,7 @@
 // ==UserScript==
 // @name        Wikidot additional user info script
 // @description Adds additional user information on user information
-// @version     v0.0.9
+// @version     v0.0.10
 // @updateURL   https://github.com/scpwiki/user-info-script/raw/main/user-info.user.js
 // @downloadURL https://github.com/scpwiki/user-info-script/raw/main/user-info.user.js
 // @include     http://www.wikidot.com/user:info/*
