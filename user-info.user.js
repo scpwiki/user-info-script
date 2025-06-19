@@ -27,17 +27,16 @@ let FETCHED_DATA = false;
 const USER_ID = getUserId();
 let USERNAME;
 let WIKIDOT_JOIN_DATE;
-let WIKIDOT_DAYS;
-let SITE_JOIN_DATE = null;
-let SITE_DAYS = null;
+let SITE_JOIN_DATE;
 
 async function fetchUserInfo(userId) {
   if (FETCHED_DATA) {
+    console.debug('Already fetched user profile information');
     return;
   }
 
   // Fetch request HTML and write into hidden element for querying
-  const dateRegex = /([^,]+, [0-9]{2}:[0-9]{2}) \(([0-9]+ days) .+\)/;
+  console.log('Fetching user profile information');
   const element = document.createElement('html');
   element.innerHTML = await new Promise(resolve => (
     unsafeWindow.OZONE.ajax.requestModule('users/UserInfoWinModule', {user_id: userId}, resolve)
@@ -45,9 +44,10 @@ async function fetchUserInfo(userId) {
 
   // Get username from header
   USERNAME = element.querySelector('h1').innerText;
+  console.log(`Got username: ${USERNAME}`);
 
   // Get data from fields
-  const fields = element.querySelectorAll('tr');
+  const fields = element.querySelectorAll('tr td');
   let i;
 
   // The first date field is the Wikidot join date
@@ -58,21 +58,21 @@ async function fetchUserInfo(userId) {
       continue;
     }
 
-    const matches = field.innerText.match(dateRegex);
-    if (matches === null) {
+    const value = field.innerText.trim();
+    const date = new Date(value);
+    if (isNaN(date)) {
       // This isn't a date, keep moving
       continue;
     }
 
     // This *is* a date, so extract the fields and quit searching
     // (but save index so we can get the second one)
-    WIKIDOT_JOIN_DATE = new Date(matches[1]);
-    WIKIDOT_DAYS = matches[2];
+    WIKIDOT_JOIN_DATE = date;
+    console.log(`Got wikidot join date: ${WIKIDOT_JOIN_DATE}`);
   }
 
   // The second date field (if it exists) is the site join date
-  let siteJoinDate = null;
-  let siteDays = null;
+  SITE_JOIN_DATE = null;
   for (; i < fields.length; i++) {
     // Same logic, as above
     const field = fields[i];
@@ -82,7 +82,7 @@ async function fetchUserInfo(userId) {
     }
 
     SITE_JOIN_DATE = new Date(matches[1]);
-    SITE_DAYS = matches[2];
+    console.log(`Got wikidot join date: ${SITE_JOIN_DATE}`);
   }
 
   FETCHED_DATA = true;
@@ -111,6 +111,30 @@ function addDescriptionEntry(descriptionList, key, value, insertIndex) {
   }
 }
 
+// From https://stackoverflow.com/a/11252167
+function treatAsUTC(date) {
+  date.setMinutes(date.getMinutes() - date.getTimezoneOffset());
+  return date;
+}
+
+function daysBetween(startDate, endDate) {
+  const millisecondsPerDay = 24 * 60 * 60 * 1000;
+  return (treatAsUTC(endDate) - treatAsUTC(startDate)) / millisecondsPerDay;
+}
+
+function daysString(date) {
+  if (date === undefined) {
+    // indicates an error
+    throw new Error('Undefined date value from user profile fetch');
+  } else if (date === null) {
+    // date missing, not an error
+    return 'none';
+  }
+
+  const days = Math.trunc(daysBetween(date, new Date()));
+  return `${days} days`;
+}
+
 function insertFields(infoElement) {
   const descriptionList = infoElement.querySelector('dl.dl-horizontal');
   if (!descriptionList) {
@@ -120,27 +144,30 @@ function insertFields(infoElement) {
 
   // Add new info elements
   addDescriptionEntry(descriptionList, 'User ID:', USER_ID, 0);
-  addDescriptionEntry(descriptionList, 'User name:', USERNAME, 1);
+  addDescriptionEntry(descriptionList, 'User name:', USERNAME, 2);
 
-  const infoLine = `${USERNAME} (W: ${WIKIDOT_DAYS}, S: ${SITE_DAYS || 'none'}, ID: ${USER_ID})`;
+  const wikidotDays = daysString(WIKIDOT_JOIN_DATE);
+  const siteDays = daysString(SITE_JOIN_DATE);
+  const infoLine = `${USERNAME} (W: ${wikidotDays}, S: ${siteDays}, ID: ${USER_ID})`;
   addDescriptionEntry(descriptionList, 'Info line:', infoLine, -1);
 }
 
-function main() {
+async function main() {
   // Set up observer to insert info every time the profile is switched to
   console.log('Creating observer for user profile');
   const element = document.getElementById('user-info-area');
-  const observer = new MutationObserver(() => {
+  const observer = new MutationObserver(async () => {
     const profileElement = element.querySelector('div.profile-box');
     if (profileElement !== null) {
       // This is the right tab, update
       // note that fetchUserInfo() only runs once
-      fetchUserInfo(USER_ID);
+      await fetchUserInfo(USER_ID);
       insertFields(element);
     }
 
-    observer.observe(element, { childList: true });
   });
+
+  observer.observe(element, { childList: true });
 }
 
 main();
