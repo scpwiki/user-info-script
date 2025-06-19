@@ -23,6 +23,7 @@ function getUserId() {
   const matches = element.href.match(userIdRegex);
   if (matches === null) {
     alert(`Private message href doesn't match regex: ${element.href}`);
+    return;
   }
 
   return matches[1];
