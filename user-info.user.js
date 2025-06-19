@@ -39,6 +39,11 @@ function getDateFromSpan(odate) {
   const timestampRegex = /time_(\d+)/;
   for (let i = 0; i < odate.classList.length; i++) {
     const matches = odate.classList[i].match(timestampRegex);
+    if (matches === null) {
+      // not the time_ class
+      continue;
+    }
+
     const timestamp = parseInt(matches[1]);
     return new Date(timestamp * 1000);
   }
