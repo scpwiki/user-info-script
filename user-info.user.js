@@ -53,6 +53,11 @@ async function fetchUserInfo(userId) {
   // The first date field is the Wikidot join date
   for (i = 0; i < fields.length; i++) {
     const field = fields[i];
+    if (field.classList.contains('active')) {
+      // Ignore keys
+      continue;
+    }
+
     const matches = field.innerText.match(dateRegex);
     if (matches === null) {
       // This isn't a date, keep moving
