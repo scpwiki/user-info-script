@@ -55,7 +55,7 @@ function getDates(descriptionList) {
   const [wikidotDateElement, siteDateElement] = descriptionList.querySelectorAll('dd span.odate');
   const wikidotDate = getDateFromSpan(wikidotDateElement);
   const siteDate = siteDateElement ? getDateFromSpan(siteDateElement) : null;
-  return { wikidotDatee, siteDate };
+  return { wikidotDate, siteDate };
 }
 
 function addDescriptionEntry(descriptionList, key, value, insertIndex) {
