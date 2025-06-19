@@ -51,18 +51,17 @@ function getDateFromSpan(odate) {
   throw new Error('No time_ class in odate span');
 }
 
-function getDates(descriptionList) {
-  const [wikidotDateElement, siteDateElement] = descriptionList.querySelectorAll('dd span.odate');
-  const wikidotDate = getDateFromSpan(wikidotDateElement);
-  const siteDate = siteDateElement ? getDateFromSpan(siteDateElement) : null;
-  return { wikidotDate, siteDate };
+function getWikidotDate(descriptionList) {
+  // only one date (user creation) for www user:info
+  const element = descriptionList.querySelector('dd span.odate');
+  return getDateFromSpan(element);
 }
 
 function addDescriptionEntry(descriptionList, key, value, insertIndex) {
   const dt = document.createElement('dt');
   const dd = document.createElement('dd');
   dt.innerText = key;
-  dd.innerText = value;
+  dd.innerHTML = value;
 
   if (insertIndex === -1) {
     // -1 means append to end
@@ -110,17 +109,16 @@ function insertFields(infoElement) {
 
   const userId = getUserId();
   const username = getUsername();
-  const { wikidotDate, siteDate } = getDates(infoElement);
-  console.debug({ userId, username, wikidotDate, siteDate });
+  const wikidotDate = getWikidotDate(infoElement);
+  const wikidotDays = daysString(wikidotDate);
+  console.debug({ userId, username, wikidotDate, wikidotDays });
 
   // Add fields
   console.log('Inserting fields');
   addDescriptionEntry(descriptionList, 'User ID:', userId, 0);
 
-  const wikidotDays = daysString(wikidotDate);
-  const siteDays = daysString(siteDate);
-  console.debug({ wikidotDays, siteDays });
-  const infoLine = `${username} (W: ${wikidotDays}, S: ${siteDays}, ID: ${userId})`;
+  const userProfileLink = `<a href="javascript:WIKIDOT.page.listeners.userInfo(${userId});">&lt;FILL OUT&gt;</a>`;
+  const infoLine = `${username} (W: ${wikidotDays}, S: ${userProfileLink}, ID: ${userId})`;
   addDescriptionEntry(descriptionList, 'Info line:', infoLine, -1);
 }
 
