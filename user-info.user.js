@@ -133,14 +133,14 @@ function insertFields(infoElement) {
   addDescriptionEntry(descriptionList, 'User ID:', userId, 0);
   addDescriptionEntry(descriptionList, 'User slug:', userSlug, 2);
 
-  const infoLine = `${username} (W: ${wikidotDays}, S: <span style="text: red;">FILL OUT</span>, ID: ${userId})`;
+  const infoLine = `${username} (W: ${wikidotDays}, S: <span style="color: red;">FILL OUT</span>, ID: ${userId})`;
   addDescriptionEntry(descriptionList, 'Info line:', infoLine, -1);
 
-  const siteProfileLink = `<a href="${SITE_PROFILE_URL_PREFIX}${userSlug}">Navigate To</a>`;
-  addDescriptionEntry(descriptionList, SITE_PROFILE_LABEL, siteProfileLink, -1);
+  const siteProfileLink = `<a href="${SITE_PROFILE_URL_PREFIX}${userSlug}">Open</a> (<a href="${SITE_PROFILE_URL_PREFIX}${userSlug}" target="_blank">new tab</a>)`;
+  addDescriptionEntry(descriptionList, 'Site profile', siteProfileLink, -1);
 
-  const userProfileLink = `<a href="javascript:WIKIDOT.page.listeners.userInfo(${userId});">Open Modal</a>`;
-  addDescriptionEntry(descriptionList, 'User profile:', userProfileLink, -1);
+  const userProfileLink = `<a href="javascript:WIKIDOT.page.listeners.userInfo(${userId});">Open dialog</a>`;
+  addDescriptionEntry(descriptionList, 'Site member modal:', userProfileLink, -1);
 }
 
 function main() {
