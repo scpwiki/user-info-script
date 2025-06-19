@@ -31,15 +31,12 @@ function getUserId() {
 }
 
 async function fetchUserInfo(userId) {
-  // Setup
+  // Fetch request HTML and write into hidden element for querying
   const dateRegex = /([^,]+, [0-9]{2}:[0-9]{2}) \(([0-9]+ days) .+\)/;
-  const userInfoPromise = new Promise(resolve => (
+  const element = document.createElement('html');
+  element.innerHTML = await new Promise(resolve => (
     OZONE.ajax.requestModule('users/UserInfoWinModule', {user_id: userId}, resolve)
   ));
-
-  // Fetch request HTML and write into hidden element for querying
-  const element = document.createElement('html');
-  element.innerHTML = await userInfoPromise.body;
 
   // Get username from header
   USERNAME = element.querySelector('h1').innerText;
