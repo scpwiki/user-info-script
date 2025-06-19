@@ -120,7 +120,7 @@ function insertFields(infoElement) {
   const wikidotDays = daysString(wikidotDate);
   const siteDays = daysString(siteDate);
   console.debug({ wikidotDays, siteDays });
-  const infoLine = `${username} (W: ${wikidotDays}, S: ${siteDays}, ID: ${USER_ID})`;
+  const infoLine = `${username} (W: ${wikidotDays}, S: ${siteDays}, ID: ${userId})`;
   addDescriptionEntry(descriptionList, 'Info line:', infoLine, -1);
 }
 
