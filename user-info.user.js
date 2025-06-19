@@ -2,6 +2,8 @@
  * Wikidot additional user info userscript
  *
  * For installation instructions, see https://05command.wikidot.com/user-scripts
+ *
+ * Contact: https://www.wikidot.com/account/messages#/new/4598089
  */
 
 // ==UserScript==
@@ -10,7 +12,6 @@
 // @version     v0.0.3
 // @updateURL   https://github.com/scpwiki/user-info-script/raw/main/user-info.user.js
 // @downloadURL https://github.com/scpwiki/user-info-script/raw/main/user-info.user.js
-// @supportURL  https://www.wikidot.com/account/messages#/new/4598089
 // @include     http://www.wikidot.com/user:info/*
 // @include     https://www.wikidot.com/user:info/*
 // @include     https://scp-wiki.wikidot.com/system:user/*
