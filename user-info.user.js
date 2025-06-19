@@ -38,7 +38,9 @@ function addDescriptionEntry(descriptionList, key, value, insertIndex) {
   descriptionList.insertBefore(dd, insertBeforeElement);
 }
 
-function main() {
+async function main() {
+  // TODO add listener to re-add fields when switching back to "profile"
+
   const infoElement = document.getElementById('user-info-area');
   if (!infoElement) {
     alert('No user info area?');
