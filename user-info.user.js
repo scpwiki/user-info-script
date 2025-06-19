@@ -17,6 +17,9 @@
 // @include     https://scp-wiki.wikidot.com/system:user/*
 // ==/UserScript==
 
+const SITE_PROFILE_URL_PREFIX = 'https://scp-wiki.wikidot.com/system:user/';
+const SITE_PROFILE_LABEL = 'SCP Wiki profile';
+
 function getUserId() {
   const element = document.querySelector('a.btn.btn-default.btn-xs');
   const userIdRegex = /https?:\/\/www\.wikidot\.com\/account\/messages#\/new\/(\d+)/;
@@ -26,6 +29,17 @@ function getUserId() {
   }
 
   return matches[1];
+}
+
+function getUserSlug() {
+  let url = window.location.href;
+  if (url.endsWith('/')) {
+    // Trim trailing slash if present
+    url = url.slice(0, -1);
+  }
+
+  // Get last URL part, containing the user slug
+  return url.substring(url.lastIndexOf('/') + 1);
 }
 
 function getUsername() {
@@ -108,18 +122,25 @@ function insertFields(infoElement) {
   }
 
   const userId = getUserId();
+  const userSlug = getUserSlug();
   const username = getUsername();
   const wikidotDate = getWikidotDate(infoElement);
   const wikidotDays = daysString(wikidotDate);
-  console.debug({ userId, username, wikidotDate, wikidotDays });
+  console.debug({ userId, userSlug, username, wikidotDate, wikidotDays });
 
   // Add fields
   console.log('Inserting fields');
   addDescriptionEntry(descriptionList, 'User ID:', userId, 0);
+  addDescriptionEntry(descriptionList, 'User slug:', userSlug, 2);
 
-  const userProfileLink = `<a href="javascript:WIKIDOT.page.listeners.userInfo(${userId});">&lt;FILL OUT&gt;</a>`;
-  const infoLine = `${username} (W: ${wikidotDays}, S: ${userProfileLink}, ID: ${userId})`;
+  const infoLine = `${username} (W: ${wikidotDays}, S: <span style="text: red;">FILL OUT</span>, ID: ${userId})`;
   addDescriptionEntry(descriptionList, 'Info line:', infoLine, -1);
+
+  const siteProfileLink = `<a href="${SITE_PROFILE_URL_PREFIX}${userSlug}">Navigate To</a>`;
+  addDescriptionEntry(descriptionList, SITE_PROFILE_LABEL, siteProfileLink, -1);
+
+  const userProfileLink = `<a href="javascript:WIKIDOT.page.listeners.userInfo(${userId});">Open Modal</a>`;
+  addDescriptionEntry(descriptionList, 'User profile:', userProfileLink, -1);
 }
 
 function main() {
