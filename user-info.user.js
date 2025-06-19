@@ -94,6 +94,7 @@ function daysString(date) {
 }
 
 function insertFields(infoElement) {
+  console.log('Reading fields');
   const descriptionList = infoElement.querySelector('dl.dl-horizontal');
   if (!descriptionList) {
     alert('No description list in user info area?');
@@ -102,24 +103,27 @@ function insertFields(infoElement) {
 
   const userId = getUserId();
   const username = getUsername();
-  const {wikidotDate, siteDate} = getDates(infoElement);
+  const { wikidotDate, siteDate } = getDates(infoElement);
+  console.debug({ userId, username, wikidotDate, siteDate });
 
   // Add fields
+  console.log('Inserting fields');
   addDescriptionEntry(descriptionList, 'User ID:', userId, 0);
 
   const wikidotDays = daysString(wikidotDate);
   const siteDays = daysString(siteDate);
+  console.debug({ wikidotDays, siteDays });
   const infoLine = `${username} (W: ${wikidotDays}, S: ${siteDays}, ID: ${USER_ID})`;
   addDescriptionEntry(descriptionList, 'Info line:', infoLine, -1);
 }
 
-async function main() {
+function main() {
   // Initial insertion of fields
   const element = document.getElementById('user-info-area');
   insertFields(element);
 
   // Set up observer to insert info every time the profile is switched to
-  console.log('Creating observer for user profile');
+  console.debug('Creating observer for user profile');
   const observer = new MutationObserver(async () => {
     const profileElement = element.querySelector('div.profile-box');
     if (profileElement !== null) {
