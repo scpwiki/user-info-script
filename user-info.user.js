@@ -21,6 +21,10 @@ function getUserId() {
   const element = document.querySelector('a.btn.btn-default.btn-xs');
   const userIdRegex = /https?:\/\/www\.wikidot\.com\/account\/messages#\/new\/(\d+)/;
   const matches = element.href.match(userIdRegex);
+  if (matches === null) {
+    alert(`Private message href doesn't match regex: ${element.href}`);
+  }
+
   return matches[1];
 }
 
