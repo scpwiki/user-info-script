@@ -15,6 +15,7 @@
 // @include     http://www.wikidot.com/user:info/*
 // @include     https://www.wikidot.com/user:info/*
 // @include     https://scp-wiki.wikidot.com/system:user/*
+// @include     https://techcheck.wikidot.com/system:user/*
 // ==/UserScript==
 
 const SITE_PROFILE_URL_PREFIX = 'https://scp-wiki.wikidot.com/system:user/';
