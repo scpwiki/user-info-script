@@ -136,8 +136,11 @@ function insertFields(infoElement) {
   const infoLine = `${username} (W: ${wikidotDays}, S: <span style="color: red;">FILL OUT</span>, ID: ${userId})`;
   addDescriptionEntry(descriptionList, 'Info line:', infoLine, -1);
 
-  const siteProfileLink = `<a href="${SITE_PROFILE_URL_PREFIX}${userSlug}">Open</a> (<a href="${SITE_PROFILE_URL_PREFIX}${userSlug}" target="_blank">new tab</a>)`;
-  addDescriptionEntry(descriptionList, 'Site profile', siteProfileLink, -1);
+  if (!window.location.href.startsWith(SITE_PROFILE_URL_PREFIX)) {
+    // Only add if not already here
+    const siteProfileLink = `<a href="${SITE_PROFILE_URL_PREFIX}${userSlug}">Open</a> (<a href="${SITE_PROFILE_URL_PREFIX}${userSlug}" target="_blank">new tab</a>)`;
+    addDescriptionEntry(descriptionList, 'Site profile', siteProfileLink, -1);
+  }
 
   const userProfileLink = `<a href="javascript:WIKIDOT.page.listeners.userInfo(${userId});">Open dialog</a>`;
   addDescriptionEntry(descriptionList, 'Site member modal:', userProfileLink, -1);
