@@ -21,6 +21,96 @@
 const SITE_PROFILE_URL_PREFIX = 'https://scp-wiki.wikidot.com/system:user/';
 const SITE_PROFILE_LABEL = 'SCP Wiki profile';
 
+const CSS = `
+#uinfo-site-days pending {
+  color: red;
+}
+`;
+
+const JS = `
+const UINFO = {
+  updateSiteDays: async function(userId) {
+    const element = document.getElementById('uinfo-site-days');
+    const { siteDate } = await UINFO.fetchSiteDays(userId);
+    element.innerText = UINFO.daysString(siteDate);
+    element.removeAttribute('onclick');
+    element.classList.remove('pending');
+  },
+
+  fetchSiteDays: async function(userId) {
+    const response = new Promise((resolve) => (
+      OZONE.ajax.requestModule('users/UserInfoWinModule', { user_id: userId }, resolve)
+    );
+
+    // for parsing the HTML response
+    const element = document.createElement('html');
+    element.innerHTML = response;
+
+    // Get data from fields
+    const fields = element.querySelectorAll('tr td');
+    let wikidotDate;
+    let siteDate = null;
+    let i;
+
+    // The first date field is the Wikidot join date
+    for (i = 0; i < fields.length; i++) {
+      const field = fields[i];
+      if (field.classList.contains('active')) {
+        // Ignore keys
+        continue;
+      }
+
+      const value = field.innerText.trim();
+      const date = new Date(value);
+      if (!isNaN(date)) {
+        // This *is* a date, so extract the fields and break
+        // (but save index so we can get the second one)
+        wikidotDate = date;
+        console.log('Got wikidot join date: ' + wikidotDate);
+        break;
+      }
+    }
+
+    // The second date field (if it exists) is the site join date
+    for (; i < fields.length; i++) {
+      // Same logic, as above
+      const field = fields[i];
+      const value = field.innerText.trim();
+      const date = new Date(value);
+      if (!isNaN(date)) {
+        // This is the second date, which is the site member join date
+        siteDate = date;
+        console.log('Got site member join date: ' + wikidotDate);
+        break;
+      }
+    }
+
+    return { wikidotDate, siteDate };
+  },
+
+  // copied from below
+  treatAsUTC: function(date) {
+    date.setMinutes(date.getMinutes() - date.getTimezoneOffset());
+    return date;
+  },
+
+  daysBetween: function(startDate, endDate) {
+    const millisecondsPerDay = 24 * 60 * 60 * 1000;
+    return (UINFO.treatAsUTC(endDate) - UINFO.treatAsUTC(startDate)) / millisecondsPerDay;
+  },
+
+  daysString: function(date) {
+    if (date === null) {
+      // date missing, not an error
+      return 'none';
+    }
+
+    const days = Math.trunc(UINFO.daysBetween(date, new Date()));
+    return days + ' days';
+  },
+};
+`;
+
 function getUserId() {
   const element = document.querySelector('a.btn.btn-default.btn-xs');
   const userIdRegex = /https?:\/\/www\.wikidot\.com\/account\/messages#\/new\/(\d+)/;
@@ -134,7 +224,7 @@ function insertFields(infoElement) {
   addDescriptionEntry(descriptionList, 'User ID:', userId, 0);
   addDescriptionEntry(descriptionList, 'User slug:', userSlug, 2);
 
-  const infoLine = `${username} (W: ${wikidotDays}, S: <span style="color: red;">FILL OUT</span>, ID: ${userId})`;
+  const infoLine = `${username} (W: ${wikidotDays}, S: <span id="uinfo-site-days" class="pending" onclick="UINFO.updateSiteDays(${userId})">CLICK ME</span>, ID: ${userId})`;
   addDescriptionEntry(descriptionList, 'Info line:', infoLine, -1);
 
   if (!window.location.href.startsWith(SITE_PROFILE_URL_PREFIX)) {
