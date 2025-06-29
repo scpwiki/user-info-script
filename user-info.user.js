@@ -22,7 +22,7 @@ const SITE_PROFILE_URL_PREFIX = 'https://scp-wiki.wikidot.com/system:user/';
 const SITE_PROFILE_LABEL = 'SCP Wiki profile';
 
 const CSS = `
-#uinfo-site-days pending {
+#uinfo-site-days.pending {
   color: red;
 }
 `;
@@ -31,6 +31,10 @@ const JS = `
 const UINFO = {
   updateSiteDays: async function(userId) {
     const element = document.getElementById('uinfo-site-days');
+    if (element === null) {
+      console.error('No #uinfo-site-days element');
+      return;
+    }
     const { siteDate } = await UINFO.fetchSiteDays(userId);
     element.innerText = UINFO.daysString(siteDate);
     element.removeAttribute('onclick');
@@ -38,13 +42,13 @@ const UINFO = {
   },
 
   fetchSiteDays: async function(userId) {
-    const response = new Promise((resolve) => (
+    const response = await new Promise((resolve) => (
       OZONE.ajax.requestModule('users/UserInfoWinModule', { user_id: userId }, resolve)
-    );
+    ));
 
     // for parsing the HTML response
     const element = document.createElement('html');
-    element.innerHTML = response;
+    element.innerHTML = response.body;
 
     // Get data from fields
     const fields = element.querySelectorAll('tr td');
@@ -224,7 +228,7 @@ function insertFields(infoElement) {
   addDescriptionEntry(descriptionList, 'User ID:', userId, 0);
   addDescriptionEntry(descriptionList, 'User slug:', userSlug, 2);
 
-  const infoLine = `${username} (W: ${wikidotDays}, S: <span id="uinfo-site-days" class="pending" onclick="UINFO.updateSiteDays(${userId})">CLICK ME</span>, ID: ${userId})`;
+  const infoLine = `${username} (W: ${wikidotDays}, S: <span id="uinfo-site-days" class="pending" onclick="UINFO.updateSiteDays(${userId})">[CLICK ME]</span>, ID: ${userId})`;
   addDescriptionEntry(descriptionList, 'Info line:', infoLine, -1);
 
   if (!window.location.href.startsWith(SITE_PROFILE_URL_PREFIX)) {
@@ -259,6 +263,7 @@ function main() {
     const profileElement = element.querySelector('div.profile-box');
     if (profileElement !== null) {
       // This is the right tab, update
+      logger.debug('Observer found a switch to the profile tab, updating');
       insertFields(element);
     }
   });
