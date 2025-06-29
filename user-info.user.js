@@ -50,49 +50,31 @@ const UINFO = {
     const element = document.createElement('html');
     element.innerHTML = response.body;
 
-    // Get data from fields
-    const fields = element.querySelectorAll('tr td');
-    let wikidotDate;
-    let siteDate = null;
-    let i;
-
-    // The first date field is the Wikidot join date
-    for (i = 0; i < fields.length; i++) {
-      const field = fields[i];
-      if (field.classList.contains('active')) {
-        // Ignore keys
-        continue;
-      }
-
-      const value = field.innerText.trim();
-      const date = new Date(value);
-      if (!isNaN(date)) {
-        // This *is* a date, so extract the fields and break
-        // (but save index so we can get the second one)
-        wikidotDate = date;
-        console.log('Got wikidot join date: ' + wikidotDate);
-        break;
-      }
-    }
-
-    // The second date field (if it exists) is the site join date
-    for (; i < fields.length; i++) {
-      // Same logic, as above
-      const field = fields[i];
-      const value = field.innerText.trim();
-      const date = new Date(value);
-      if (!isNaN(date)) {
-        // This is the second date, which is the site member join date
-        siteDate = date;
-        console.log('Got site member join date: ' + wikidotDate);
-        break;
-      }
-    }
-
+    // Get dates from the table
+    const [wikidotElement, siteElement] = element.querySelectorAll('tr td span.odate');
+    const wikidotDate = UINFO.getDateFromSpan(wikidotElement);
+    const siteDate = siteElement ? UINFO.getDateFromSpan(siteElement) : null;
+    console.log({ wikidotDate, siteDate });
     return { wikidotDate, siteDate };
   },
 
   // copied from below
+  getDateFromSpan: function(odate) {
+    const timestampRegex = /time_(\d+)/;
+    for (let i = 0; i < odate.classList.length; i++) {
+      const matches = odate.classList[i].match(timestampRegex);
+      if (matches === null) {
+        // not the time_ class
+        continue;
+      }
+
+      const timestamp = parseInt(matches[1]);
+      return new Date(timestamp * 1000);
+    }
+
+    throw new Error('No time_ class in odate span');
+  },
+
   treatAsUTC: function(date) {
     date.setMinutes(date.getMinutes() - date.getTimezoneOffset());
     return date;
