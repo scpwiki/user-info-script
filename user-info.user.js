@@ -238,6 +238,17 @@ function insertFields(infoElement) {
 }
 
 function main() {
+  // Add styling
+  const styleSheet = document.createElement('style');
+  styleSheet.innerHTML = CSS;
+  document.head.appendChild(styleSheet);
+
+  // Add scripts
+  const scriptBlock = document.createElement('script');
+  scriptBlock.type = 'text/javascript';
+  scriptBlock.innerHTML = JS;
+  document.head.appendChild(scriptBlock);
+
   // Initial insertion of fields
   const element = document.getElementById('user-info-area');
   insertFields(element);
