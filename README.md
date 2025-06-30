@@ -12,6 +12,8 @@ Because getting the membership length depends on a different API call, we cannot
 
 The list of site profiles is configured in the Javascript, and does not provide a link to the site you are already on.
 
+![screenshot of site profile list](screenshot-site-profiles.png)
+
 Feel free to fork this script to change the exact links provided or to localize the text.
 
 **You can [install the script](https://github.com/scpwiki/user-info-script/raw/refs/heads/main/user-info.user.js) here.**
