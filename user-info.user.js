@@ -60,16 +60,13 @@ const UINFO = {
 
   // copied from below
   getDateFromSpan: function(odate) {
-    const timestampRegex = /time_(\d+)/;
     for (let i = 0; i < odate.classList.length; i++) {
-      const matches = odate.classList[i].match(timestampRegex);
-      if (matches === null) {
-        // not the time_ class
-        continue;
+      const klass = odate.classList[i];
+      if (klass.startsWith('time_')) {
+        // is the time_ class
+        const timestamp = parseInt(klass.substr(5));
+        return new Date(timestamp * 1000);
       }
-
-      const timestamp = parseInt(matches[1]);
-      return new Date(timestamp * 1000);
     }
 
     throw new Error('No time_ class in odate span');
@@ -127,16 +124,13 @@ function getUsername() {
 }
 
 function getDateFromSpan(odate) {
-  const timestampRegex = /time_(\d+)/;
   for (let i = 0; i < odate.classList.length; i++) {
-    const matches = odate.classList[i].match(timestampRegex);
-    if (matches === null) {
-      // not the time_ class
-      continue;
+    const klass = odate.classList[i];
+    if (klass.startsWith('time_')) {
+      // is the time_ class
+      const timestamp = parseInt(klass.substr(5));
+      return new Date(timestamp * 1000);
     }
-
-    const timestamp = parseInt(matches[1]);
-    return new Date(timestamp * 1000);
   }
 
   throw new Error('No time_ class in odate span');
