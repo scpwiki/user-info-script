@@ -239,7 +239,7 @@ function main() {
     const profileElement = element.querySelector('div.profile-box');
     if (profileElement !== null) {
       // This is the right tab, update
-      logger.debug('Observer found a switch to the profile tab, updating');
+      console.debug('Observer found a switch to the profile tab, updating');
       insertFields(element);
     }
   });
