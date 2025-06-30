@@ -15,11 +15,15 @@
 // @include     http://www.wikidot.com/user:info/*
 // @include     https://www.wikidot.com/user:info/*
 // @include     https://scp-wiki.wikidot.com/system:user/*
+// @include     http://scp-sandbox-3.wikidot.com/system:user/*
+// @include     https://scp-sandbox-3.wikidot.com/system:user/*
 // @include     https://techcheck.wikidot.com/system:user/*
 // ==/UserScript==
 
-const SITE_PROFILE_URL_PREFIX = 'https://scp-wiki.wikidot.com/system:user/';
-const SITE_PROFILE_LABEL = 'SCP Wiki profile';
+const SITE_PROFILES = {
+  'SCP Wiki': 'https://scp-wiki.wikidot.com/system:user/',
+  'SCP Sandbox III': 'https://scp-sandbox-3.wikidot.com/system:user/',
+};
 
 const CSS = `
 #uinfo-site-days.pending {
@@ -207,10 +211,18 @@ function insertFields(infoElement) {
   const infoLine = `${username} (W: ${wikidotDays}, S: <span id="uinfo-site-days" class="pending" onclick="UINFO.updateSiteDays(${userId})">[CLICK ME]</span>, ID: ${userId})`;
   addDescriptionEntry(descriptionList, 'Info line:', infoLine, -1);
 
-  if (!window.location.href.startsWith(SITE_PROFILE_URL_PREFIX)) {
-    // Only add if not already here
-    const siteProfileLink = `<a href="${SITE_PROFILE_URL_PREFIX}${userSlug}">Open</a> (<a href="${SITE_PROFILE_URL_PREFIX}${userSlug}" target="_blank">new tab</a>)`;
-    addDescriptionEntry(descriptionList, 'Site profile', siteProfileLink, -1);
+  const siteProfiles = [];
+  const siteEntries = Object.entries(SITE_PROFILES);
+  for (let i = 0; i < siteEntries.length; i++) {
+    const [siteName, siteProfileUrl] = siteEntries[i];
+    if (!window.location.href.startsWith(siteProfileUrl)) {
+      // Only add if it's not the current site
+      siteProfiles.push(`<a href="${siteProfileUrl}${userSlug}" target="_blank">${siteName}</a>`);
+    }
+  }
+
+  if (siteProfiles.length) {
+    addDescriptionEntry(descriptionList, 'Site profiles:', siteProfiles.join(', '), -1);
   }
 
   const userProfileLink = `<a href="javascript:WIKIDOT.page.listeners.userInfo(${userId});">Open dialog</a>`;
