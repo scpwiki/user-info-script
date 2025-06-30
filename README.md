@@ -8,11 +8,11 @@ It also exposes convenient links, one to navigate to the SCP Wiki or SCP Sandbox
 
 Because getting the membership length depends on a different API call, we cannot populate it automatically. But if the user clicks on the text, they can prompt a call to fetch and display that information:
 
-![screenshot of user info after click](screenshot-site-days.png)
+![screenshot of user info after click](screenshot-days.png)
 
 The list of site profiles is configured in the Javascript, and does not provide a link to the site you are already on.
 
-![screenshot of site profile list](screenshot-site-profiles.png)
+![screenshot of site profile list](screenshot-profiles.png)
 
 Feel free to fork this script to change the exact links provided or to localize the text.
 
