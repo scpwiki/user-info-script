@@ -9,7 +9,7 @@
 // ==UserScript==
 // @name        Wikidot additional user info script
 // @description Adds additional user information on user information
-// @version     v0.3.1
+// @version     v0.3.2
 // @updateURL   https://github.com/scpwiki/user-info-script/raw/main/user-info.user.js
 // @downloadURL https://github.com/scpwiki/user-info-script/raw/main/user-info.user.js
 // @include     http://www.wikidot.com/user:info/*
@@ -208,7 +208,7 @@ function insertFields(infoElement) {
   addDescriptionEntry(descriptionList, 'User ID:', userId, 0);
   addDescriptionEntry(descriptionList, 'User slug:', userSlug, 2);
 
-  const infoLine = `${username} (W: ${wikidotDays}, S: <span id="uinfo-site-days" class="pending" onclick="UINFO.updateSiteDays(${userId})">[CLICK ME]</span>, ID: ${userId})`;
+  const infoLine = `[[*user ${username}]] (W: ${wikidotDays}, S: <span id="uinfo-site-days" class="pending" onclick="UINFO.updateSiteDays(${userId})">[CLICK ME]</span>, ID: ${userId})`;
   addDescriptionEntry(descriptionList, 'Info line:', infoLine, -1);
 
   const siteProfiles = [];
