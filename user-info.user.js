@@ -117,7 +117,7 @@ function getUserSlug() {
   }
   // Promotion script may include an anchor in the URL
   let hashIndex = url.indexOf('#');
-  if (hashIndex != -1) {
+  if (hashIndex !== -1) {
     url = url.substring(0, hashIndex);
   }
 
