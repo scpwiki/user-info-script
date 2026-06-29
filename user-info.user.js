@@ -9,7 +9,7 @@
 // ==UserScript==
 // @name        Wikidot additional user info script
 // @description Adds additional user information on user information
-// @version     v0.3.2
+// @version     v0.3.3
 // @updateURL   https://github.com/scpwiki/user-info-script/raw/main/user-info.user.js
 // @downloadURL https://github.com/scpwiki/user-info-script/raw/main/user-info.user.js
 // @include     http://www.wikidot.com/user:info/*
@@ -114,6 +114,11 @@ function getUserSlug() {
   if (url.endsWith('/')) {
     // Trim trailing slash if present
     url = url.slice(0, -1);
+  }
+  // Promotion script may include an anchor in the URL
+  let anchorIndex = url.indexOf('#');
+  if (anchorIndex !== -1) {
+    url = url.substring(0, anchorIndex);
   }
 
   // Get last URL part, containing the user slug
