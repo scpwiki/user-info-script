@@ -116,9 +116,9 @@ function getUserSlug() {
     url = url.slice(0, -1);
   }
   // Promotion script may include an anchor in the URL
-  let hashIndex = url.indexOf('#');
-  if (hashIndex !== -1) {
-    url = url.substring(0, hashIndex);
+  let anchorIndex = url.indexOf('#');
+  if (anchorIndex !== -1) {
+    url = url.substring(0, anchorIndex);
   }
 
   // Get last URL part, containing the user slug
