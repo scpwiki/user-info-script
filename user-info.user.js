@@ -12,12 +12,11 @@
 // @version     v0.3.3
 // @updateURL   https://github.com/scpwiki/user-info-script/raw/main/user-info.user.js
 // @downloadURL https://github.com/scpwiki/user-info-script/raw/main/user-info.user.js
-// @include     http://www.wikidot.com/user:info/*
 // @include     https://www.wikidot.com/user:info/*
 // @include     https://scp-wiki.wikidot.com/system:user/*
-// @include     http://scp-sandbox-3.wikidot.com/system:user/*
 // @include     https://scp-sandbox-3.wikidot.com/system:user/*
 // @include     https://techcheck.wikidot.com/system:user/*
+// @include     https://scpwiki.com/system:user/*
 // ==/UserScript==
 
 const SITE_PROFILES = {
