@@ -20,7 +20,7 @@
 // ==/UserScript==
 
 const SITE_PROFILES = {
-  'SCP Wiki': 'https://scp-wiki.wikidot.com/system:user/',
+  'SCP Wiki': 'https://scpwiki.com/system:user/',
   'SCP Sandbox III': 'https://scp-sandbox-3.wikidot.com/system:user/',
 };
 
